@@ -30,7 +30,7 @@ and only dials once it is confirmed.
 | `tier` | `0` announcement (no LLM in the call path), `1` conversational |
 | `recipient` | Must resolve to an allowlist entry. `relationship` is prompt material — it sets the register |
 | `message` | The thing being conveyed. Written to be *spoken*, not read |
-| `anticipated_questions` | Pre-authorised answers. Anything not here gets "I don't know, Alex will follow up" |
+| `anticipated_questions` | Pre-authorised answers. Anything not here gets "I don't know — contact Alex directly". A question that is really a request to pass a message on gets `REFUSAL`, meaning the fixed no-message wording from the conduct layer |
 | `prohibitions` | Explicit negative constraints for this call, on top of the standing ones in the conduct layer |
 | `closing` | How to end, so the agent doesn't improvise a goodbye |
 | `caps` | Hard turn and duration limits |
@@ -54,4 +54,14 @@ to be heard. Rules of thumb:
   simple case. One-way, no agent, no conversation.
 - [`briefs/tier1-plumber-visit.json`](briefs/tier1-plumber-visit.json) — the
   case that needs the voice agent, and shows what `anticipated_questions` and
-  `prohibitions` are for.
+  `prohibitions` are for. Note the "can I speak to Alex?" entry: that is a
+  message-taking request wearing a question's clothes, and it resolves to a
+  refusal rather than an answer.
+
+## The one thing a brief cannot authorise
+
+A brief can widen what the agent may *say*. It can never grant a return
+channel. No brief may instruct the agent to take a message, accept a reply,
+promise a callback, or relay an answer — those are refused regardless of what
+the brief says, because the prohibition lives in the fixed conduct layer above
+it. See [`../docs/plan.md`](../docs/plan.md#decisions-taken), D10.

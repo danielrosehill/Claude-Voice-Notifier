@@ -132,10 +132,34 @@ Three layers, assembled at `setup`. Only the third is per-call.
 > question the message obviously raises, if the brief gives you the answer. You
 > may not commit {{operator_name}} to anything, agree to any arrangement,
 > speculate, or improvise facts. If asked something the brief does not cover,
-> say you don't know and that {{operator_name}} will follow up directly.
-> Keep every reply to one or two short sentences — this is a phone call, not an
-> essay. If the person wants to talk to {{operator_name}}, say you will pass
-> that on, and end the call warmly.
+> say you don't know and that the person should contact {{operator_name}}
+> directly. Keep every reply to one or two short sentences — this is a phone
+> call, not an essay.
+>
+> **You cannot take a message.** This call goes one way. If the person asks you
+> to tell {{operator_name}} something, to pass anything on, to relay an answer,
+> or to have {{operator_name}} call them back, you must decline using the
+> wording below. Do not agree, do not offer to try, and do not soften it into a
+> maybe. Then close the call warmly.
+
+**2b. The refusal — verbatim, not paraphrased.**
+
+> "I'm sorry — I can't take a message. I'm a one-way notification, so there's
+> no way for me to make sure that reaches {{operator_name}} properly, and I
+> don't want to tell you it will. The best thing is to contact
+> {{operator_name}} directly."
+
+This is fixed wording rather than something the model composes, for one
+specific reason: declining runs against the grain of a helpful model, and a
+model writing its own refusal will reliably soften it into a promise — *"I'll
+make sure Alex knows"* — which is exactly the behaviour the design forbids.
+Pinning the words removes the drift.
+
+Note what the refusal does **not** say. It does not claim the words vanish; the
+operator does receive a transcript, and an agent asserting otherwise would be
+lying. It claims only that the agent will not *carry* the message, because it
+cannot guarantee delivery. That distinction is the honest one and it is
+explained in full in [the plan](plan.md#the-transcript-is-not-a-return-channel-and-the-agent-must-not-pretend-otherwise).
 
 **3. Brief — written fresh for this call, thrown away afterwards.**
 
@@ -150,13 +174,20 @@ only ever the content, never the guardrails.
 
 ### Voice and language
 
-Open question, and possibly decisive: **if these calls need to be in Hebrew**,
-voice quality is the constraint that outranks everything else in this document.
-ConversationRelay lets you select the TTS provider and voice, and the STT
-language, per session — so it is configurable — but "configurable" and "good
-enough to send to a family member" are different claims and only a Phase 2
-spike can distinguish them. If the Hebrew is poor, that alone justifies
-revisiting the platform choice in favour of whoever has the best Hebrew voice.
+**English only.** Settled 2026-08-12.
+
+This was the open question with the most power to overturn the platform choice:
+had these calls needed Hebrew, voice quality would have outranked every other
+criterion in this document, and a platform with better Hebrew would have won
+regardless of how clean its per-call prompt story was. It doesn't apply, so the
+recommendation stands on its merits.
+
+ConversationRelay does let you select the TTS provider, the voice, and the STT
+language per session, so adding a language later is configuration rather than
+rearchitecture. But "configurable" and "good enough to send to a family member"
+are different claims, and only a spike would distinguish them — so if the
+recipient list ever grows to include someone who should be called in Hebrew,
+treat that as reopening the platform question, not as changing a setting.
 
 ---
 

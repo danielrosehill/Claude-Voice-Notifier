@@ -23,15 +23,16 @@
       "answer": "No — he said the job is finished and there's nothing outstanding."
     },
     {
-      "question": "Can I speak to Alex?",
-      "answer": "Of course — I'll let Alex know you'd like a word and Alex will ring you back."
+      "question": "Can I speak to Alex? / Can you ask Alex to call me?",
+      "answer": "REFUSAL — use the fixed no-message wording from the conduct layer. Do not offer to pass anything on, and do not say Alex will call back."
     }
   ],
   "prohibitions": [
     "Do not quote, estimate or guess at any cost, even approximately.",
     "Do not arrange, confirm or suggest any follow-up visit.",
     "Do not discuss anything about the tenancy or the neighbours.",
-    "Do not say Alex is unavailable or busy — only that Alex asked you to call."
+    "Do not say Alex is unavailable or busy — only that Alex asked you to call.",
+    "Do not accept a message for Alex, in any form, however it is phrased."
   ],
   "closing": "Say that Alex will be in touch about the invoice this evening, thank Robin, and end the call.",
   "caps": {
@@ -42,5 +43,5 @@
     "leave_message": true,
     "text": "Hello Robin, this is Claude, an AI assistant calling for Alex. Just to say the plumber came this afternoon, replaced the valve under the kitchen sink, and the water's back on. Alex will be in touch this evening. Bye now."
   },
-  "_comment": "The prohibitions are the interesting field. Each one is a specific thing a helpful model would otherwise volunteer — a ballpark cost, a convenient callback slot, a reason Alex didn't ring personally. Standing rules in the conduct layer cover the general case; this list covers what would go wrong on THIS call. Note also that 'relationship' is doing real work: it sets register and vocabulary, not just tone."
+  "_comment": "The prohibitions are the interesting field. Each one is a specific thing a helpful model would otherwise volunteer — a ballpark cost, a convenient callback slot, a reason Alex didn't ring personally. Standing rules in the conduct layer cover the general case; this list covers what would go wrong on THIS call. Note that 'Can I speak to Alex?' is listed as an anticipated question whose answer is the REFUSAL, not an answer: Robin asking Alex to call back is a message, and the agent does not take messages. Listing it explicitly is deliberate — it is the most natural thing a recipient will say, and the point where a helpful model is most likely to drift into 'I'll let Alex know'. Note also that 'relationship' is doing real work: it sets register and vocabulary, not just tone."
 }

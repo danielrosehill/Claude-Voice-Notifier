@@ -18,8 +18,11 @@ Claude must then:
 3. Place a real phone call to Sam.
 4. Speak as an identified AI assistant acting on Alex's behalf, deliver the
    message, handle a small amount of back-and-forth, and end the call.
-5. Report back into the session what actually happened, including anything Sam
-   said in reply.
+5. Report back into the session what actually happened — whether it connected,
+   whether a human or a machine answered, and the transcript.
+
+Step 5 is for the operator's oversight, not for message-passing, and the
+distinction matters enough to have its own section below.
 
 Two properties make this different from ordinary voice-agent work:
 
@@ -28,10 +31,11 @@ Two properties make this different from ordinary voice-agent work:
 - **The volume is one.** Nothing here is a throughput problem. Latency and
   naturalness matter; cost per minute is irrelevant at this scale.
 
-## The three tiers
+## The tiers
 
 The single most useful thing in this plan: the requirement is not one feature,
-it is three, and they have wildly different costs.
+and the pieces have wildly different costs. Two are in scope; the third is
+named so that it stays rejected.
 
 ### Tier 0 — announcement (no voice agent)
 
@@ -50,22 +54,73 @@ the fallback whenever the conversational tier fails.
 
 ### Tier 1 — conversational, bounded
 
-The recipient can talk back. The agent answers questions that the brief
-anticipated, deflects the ones it did not, and makes no commitments. This is
-the tier the framework survey is about, and the main body of work.
+The recipient can talk back, and the agent can respond. It answers questions
+the brief anticipated, deflects the ones it did not, makes no commitments, and
+**takes no messages**. This is the tier the framework survey is about, and the
+main body of work.
 
-### Tier 2 — errand with a return value
+"Conversational" here means the recipient does not have to listen in silence to
+a recording — not that a dialogue is being opened. The agent's side of the
+conversation is bounded by the brief in advance.
 
-The call has a goal beyond delivery: confirm a time, get a yes/no, find out
-whether Robin needs a lift on Thursday. The agent must come back with a
-*structured* answer, not just a transcript. Adds tool-calling and an outcome
-schema on top of tier 1.
+### Tier 2 — errand with a return value — **rejected, 2026-08-12**
 
-This is past what the word *notifier* promises, and that is intentional. Tier 2
-is where the thing becomes genuinely useful and also where it becomes capable
-of causing real trouble, because a misheard answer propagates silently into
-decisions the operator then makes. Not in the first version, and it should be
-renamed if it ever becomes the main event.
+The call would have a goal beyond delivery: confirm a time, get a yes/no, find
+out whether Robin needs a lift on Thursday. The agent would come back with a
+*structured* answer.
+
+**This is out of scope, and not on a roadmap.** The product is a notifier — a
+pager, conceptually — and a pager does not take messages. The agent has **no
+return channel**: it cannot accept a reply for the operator, cannot promise to
+pass anything on, and must decline when asked to.
+
+The reasoning is worth keeping, because tier 2 is the thing that will get
+proposed again:
+
+- The value is real but the failure is silent. A misheard or subtly reframed
+  reply arrives in the operator's session carrying the authority of a direct
+  quote, and gets acted on. Nobody involved has any signal that it went wrong —
+  the recipient believes the message was delivered, the operator believes they
+  heard it, and only the consequences disagree.
+- Every other risk in this design is *loud*. A bad notification is embarrassing
+  immediately and gets corrected. A bad return value is quiet and compounds.
+- There is a working alternative that costs the recipient one action: contact
+  the operator directly. The relay saves a small amount of friction and buys a
+  large amount of ambiguity about who said what.
+
+If a return channel is ever wanted, it should be built as a different product
+with a different name and its own consent conversation, not grown quietly out
+of this one.
+
+## The transcript is not a return channel, and the agent must not pretend otherwise
+
+There is a tension in D10 worth naming, because the naive version of it is a
+lie the agent would tell.
+
+The operator receives a transcript of the call — they must, it is their call and
+it is how a bad notification gets caught. So if Robin says "tell Alex Thursday
+doesn't work" and the agent declines to take the message, Robin's words *still
+reach Alex*, in the transcript. An agent that says "nothing you say to me goes
+to Alex" would be stating something false.
+
+The resolution is in what the refusal actually claims. It does not claim
+Robin's words vanish. It claims the agent **will not carry them as a message**,
+because it cannot guarantee they arrive, arrive intact, or arrive in time — and
+so Robin should not rely on it and should contact Alex directly. That is true,
+and it is the honest reason not to use a notifier as a mailbox.
+
+Two rules follow, and they are the real content of D10:
+
+1. **The refusal is about reliability, not secrecy.** Fixed wording, in the
+   conduct layer. It never promises delivery and never claims non-delivery.
+2. **On the operator's side, a transcript is oversight material, not
+   instruction.** When Claude reports the call, anything the recipient said is
+   reported as an observation — "Robin mentioned Thursday doesn't work" — and
+   Claude must not act on it, schedule against it, or treat it as confirmed.
+   Acting on it requires the operator to go and check with Robin directly.
+
+Rule 2 is the one that will erode if it isn't written down, because acting on
+it is exactly what a helpful assistant wants to do next.
 
 ## Decisions taken
 
@@ -80,6 +135,8 @@ renamed if it ever becomes the main event.
 | D7 | Recipient allowlist, seeded manually | Claude must not be able to dial an arbitrary number it inferred from context |
 | D8 | Ship tier 0 first and keep it as the permanent fallback | Highest value per unit of work in the whole plan |
 | D9 | Vapi considered as a middleware layer and not chosen | Two reasons: the operator reports mixed results with it in prior use, and its model is campaign-shaped — a saved assistant plus variable fills. Its transient-assistant mode *does* meet the per-call-prompt requirement, so it stays the first fallback if ConversationRelay disappoints in Phase 2 |
+| D10 | **No return channel.** The agent never accepts a message for the operator, and refuses with a fixed template when asked | The failure mode of a relayed reply is silent — see [tier 2](#tier-2--errand-with-a-return-value--rejected-2026-08-12). A fixed template rather than a model-composed refusal, because a helpful model will otherwise soften it into a promise |
+| D11 | English only for now | Confirmed 2026-08-12. Removes the one open question that could have overturned D2 on voice quality. Revisit if the recipient list changes |
 
 ## Phases
 
@@ -103,11 +160,17 @@ A WebSocket server bridging ConversationRelay to Claude, with the system prompt
 built from custom parameters carried in the TwiML. Deliberately crude: one
 hardcoded brief, calls to the operator's own mobile only, no allowlist, no
 persistence. The purpose is to find out what is actually hard — latency,
-interruption handling, how a synthesised voice sounds delivering a household
-message, whether Hebrew works.
+interruption handling, and how a synthesised voice sounds delivering a
+household message.
 
-Done when: the operator can hold a fifteen-second conversation with it and
-report whether it feels acceptable to point at another person.
+Test the refusal path explicitly in this phase, not later: ask the agent to
+pass a message back and check it declines cleanly rather than obliging. It is
+the single behaviour most likely to be quietly wrong, because declining runs
+against the model's grain.
+
+Done when: the operator can hold a fifteen-second conversation with it, get a
+clean refusal when asking it to relay something, and report whether it feels
+acceptable to point at another person.
 
 ### Phase 3 — brief schema and the guardrails
 
@@ -131,31 +194,35 @@ Plus a `reference/` for the ConversationRelay message shapes and the Twilio
 call parameters, because those are the things that will otherwise be
 rediscovered every time.
 
-### Phase 5 — tier 2, if it has earned it
+Phase 4 is the last phase. There is no phase 5 — tier 2 is rejected, not
+scheduled.
 
-Structured outcomes and tool use. Gated on tier 1 being something the household
-does not find irritating.
+## Settled
+
+Both of these were open when the plan was first written and both were answered
+on 2026-08-12. Recorded here because "we already decided this" is cheaper than
+deciding it again.
+
+- **Hebrew: not required for now.** English only. This was the one question
+  capable of overturning the platform choice, since a household message in
+  stilted Hebrew is worse than no call and voice quality would have outranked
+  every other criterion. It doesn't apply, so D2 stands unchallenged. Revisit
+  only if the recipient list changes.
+- **One-way, not two-way.** The model is a pager. The agent may converse, but
+  there is no return channel — see [D10](#decisions-taken) and the
+  [transcript section](#the-transcript-is-not-a-return-channel-and-the-agent-must-not-pretend-otherwise).
 
 ## Open questions
 
-These need answers from the operator, and two of them can change the design.
+Three left, none of them blocking design work.
 
-1. **Hebrew.** Do these calls need to be in Hebrew, or at least
-   Hebrew-capable? This is a first-order question, not a polish item — it
-   constrains TTS voice selection, STT accuracy, and possibly the platform
-   choice itself. A household message delivered in stilted Hebrew is worse than
-   no call. *Blocks: platform confirmation in Phase 2.*
-2. **One-way or two-way, honestly?** If most real errands are "tell them X",
-   tier 0 may be the entire product and phases 2–5 are optional. Worth
-   answering before building a WebSocket server. *Blocks: whether Phase 2
-   happens at all.*
-3. **Which number does it call from?** A new Twilio number, or one of the two
+1. **Which number does it call from?** A new Twilio number, or one of the two
    existing lines? A new number costs about a dollar a month and buys a clean,
    recognisable identity. *Blocks: Phase 1.*
-4. **Who is on the allowlist at launch?** Suggest: the operator's own mobile
+2. **Who is on the allowlist at launch?** Suggest: the operator's own mobile
    only, for as long as it takes to stop being embarrassing.
-5. **Recording.** Transcript-only, or audio too? Transcript is enough for the
-   outcome loop and is much easier to justify to the person on the other end.
+3. **Recording.** Transcript-only, or audio too? Transcript is enough and is
+   much easier to justify to the person on the other end.
 
 ## Prior art and what it tells us
 

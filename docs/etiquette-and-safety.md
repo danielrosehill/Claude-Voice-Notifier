@@ -68,15 +68,22 @@ both expensive and alarming.
 operator, the conversation leaves the brief, the recipient sounds distressed,
 the caps are hit. All route to the same close:
 
-> "I'll let Alex know you asked, and Alex will get back to you. Thanks Sam —
-> bye now."
+> "That's all I've got, and the best thing is to contact Alex directly. Thanks
+> Sam — bye now."
 
 Then hang up. The agent never tries to hold the call.
 
 **No commitments.** The agent cannot agree to a time, accept an offer, confirm
 an arrangement, or answer on the operator's behalf about anything the brief did
-not pre-authorise. "I don't know, Alex will follow up" is always available and
-always acceptable.
+not pre-authorise. "I don't know — it's best to contact Alex directly" is
+always available and always acceptable.
+
+**No messages, in either direction but one.** The agent does not accept
+anything for return delivery. Asked to pass something on, it declines using
+[fixed wording](architecture.md#prompt-composition) and does not improvise
+around it. The exit line above deliberately says *contact Alex directly* rather
+than *I'll let Alex know* — the second is a promise the agent has no way to
+keep, and it is the exact phrase a helpful model drifts toward.
 
 **Content the agent must never carry.** Health information, financial detail,
 credentials, anything about a third party who is not on the call, and anything
@@ -96,10 +103,18 @@ this system can produce.
 
 Design position: **transcript only, no stored audio**, in the first version.
 
-The transcript is what the outcome loop needs — it goes back into the operator's
-session so Claude can report what was said. Audio adds nothing to that and
-changes the character of what is being asked of the recipient. Fewer things to
-justify, fewer things to hold.
+The transcript exists for the operator's oversight — it is how a notification
+that landed badly gets noticed. Audio adds nothing to that and changes the
+character of what is being asked of the recipient. Fewer things to justify,
+fewer things to hold.
+
+**A transcript is not an inbox.** Because the operator sees it, anything the
+recipient said does technically reach them — which is why the agent's refusal
+is worded around *reliability* rather than secrecy, and why Claude must report
+recipient remarks as observations and never act on them. The full reasoning is
+in [the plan](plan.md#the-transcript-is-not-a-return-channel-and-the-agent-must-not-pretend-otherwise);
+it is the rule most likely to erode, because acting on it is what a helpful
+assistant wants to do next.
 
 Whatever is retained, the recipient is told plainly if they ask, and the
 retention period is short and stated in the code rather than implied by
@@ -125,5 +140,5 @@ Before adding any capability, ask the question in the recipient's voice:
 > *Would Sam, hearing about this feature afterwards, feel it was reasonable —
 > or feel that something had been done to them?*
 
-Tier 0 and tier 1 pass. Some of the obvious tier 2 extensions do not, which is
-most of why tier 2 is deferred.
+Tier 0 and tier 1 pass. The obvious tier 2 extensions do not, which is most of
+why tier 2 is rejected outright rather than parked.

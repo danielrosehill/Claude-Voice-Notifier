@@ -92,7 +92,7 @@ volume — while adding a vendor between Claude and the call for no gain, since
 the transient-assistant prompt still has to be composed by our code anyway.
 
 **But keep it warm.** If the Phase 2 ConversationRelay spike disappoints —
-latency, Hebrew voice quality, or the WebSocket server proving more operational
+latency, voice quality, or the WebSocket server proving more operational
 burden than it is worth — Vapi's transient assistant is the first fallback, and
 it would get to a working call faster than anything else on this list.
 
@@ -128,8 +128,12 @@ it would get to a working call faster than anything else on this list.
 
 **In its favour:** best-in-class TTS, native SIP trunking, and it cut
 Conversational AI pricing by roughly half in February 2026 *(unverified — from a
-search summary)*. If Hebrew voice quality turns out to be the binding
-constraint, this is the option that most deserves a second look.
+search summary)*.
+
+Its strongest argument here was multilingual voice quality, and that argument
+lapsed on 2026-08-12 when the scope was fixed to English only. If the language
+question ever reopens, this is the option that most deserves a second look —
+and closing the unverified outbound gap below becomes worth doing first.
 
 ---
 

@@ -26,12 +26,26 @@ notification by voice**: Claude has something the operator wants a specific
 person to know, and the telephone is the channel most likely to actually reach
 them.
 
-That framing settles arguments before they start. A notifier speaks. It may
-answer a question the message obviously raises. It does not negotiate, does not
-commit the operator to anything, and does not come back with a decision it was
-trusted to make. Anything that needs a *reply* the operator will act on is a
-different and much riskier product — kept in scope as tier 2 in the plan, but
-explicitly beyond what this name promises.
+The right mental model is a **pager**, not an assistant. It goes one way. It
+reaches you, it tells you the thing, and that is the end of the transaction.
+
+Concretely, and this is the load-bearing constraint of the whole design:
+
+> **There is no return channel.** The agent may talk — it can answer a question
+> the message obviously raises, from answers written into the brief in advance.
+> But it cannot carry anything back. If the recipient says "tell Alex that
+> Thursday doesn't work", the agent declines, in as many words: it is a one-way
+> notification, it has no ability to deliver a message, and they should contact
+> Alex directly.
+
+That refusal is a fixed template, not something the model composes in the
+moment. See [the conduct layer](docs/architecture.md#prompt-composition).
+
+Refusing to take messages sounds like a limitation and is actually the feature.
+The failure mode that would make this product harmful is a misheard reply
+arriving in the operator's session with the authority of a direct quote, and
+being acted on. Removing the return channel removes that failure mode entirely,
+rather than trying to engineer around it.
 
 ## The shape of the thing
 
@@ -61,12 +75,16 @@ That distinction drives the whole survey in
 
 Short version, so you don't have to read four documents to get the punchline:
 
-- **There are three tiers, and tier 0 is worth shipping on its own.** A one-way
-  spoken notification needs no voice agent at all — just TwiML `<Say>` and the
-  Twilio tooling already in place. It is buildable in an afternoon, it is
-  impossible for it to say anything unplanned, and for a *notifier* it may
-  honestly be most of the product. Don't let the interesting problem block the
-  easy win.
+- **There are two tiers, and tier 0 is worth shipping on its own.** A spoken
+  notification with no conversation at all needs no voice agent — just TwiML
+  `<Say>` and the Twilio tooling already in place. It is buildable in an
+  afternoon, it is impossible for it to say anything unplanned, and for a
+  *notifier* it may honestly be most of the product. Don't let the interesting
+  problem block the easy win.
+- **English only, and no return channel.** Both settled 2026-08-12. Hebrew is
+  not required for now, which removes the one criterion that could have
+  overturned the platform choice. The return channel is not deferred, it is
+  rejected — see above.
 - **For the conversational tier, Twilio ConversationRelay with Claude as the
   LLM.** Twilio does speech-to-text, text-to-speech and interruption handling;
   you supply the model over a WebSocket you control, which means the system
