@@ -1,0 +1,21 @@
+{
+  "brief_id": "b_20260812_1642_boiler",
+  "tier": 0,
+  "operator": {
+    "name": "Alex"
+  },
+  "recipient": {
+    "key": "sam",
+    "name": "Sam",
+    "relationship": "Alex's partner",
+    "number": "+15550143",
+    "language": "en-GB"
+  },
+  "message": "The boiler's fixed. The engineer finished about half an hour ago and the hot water is back on. Alex will be home around six.",
+  "closing": "That's everything. Thanks Sam, bye now.",
+  "voicemail": {
+    "leave_message": true,
+    "text": "Hi Sam, this is Claude, an AI assistant calling for Alex. The boiler's fixed and the hot water is back on. Alex will be home around six. Bye now."
+  },
+  "_comment": "Tier 0 has no anticipated_questions, prohibitions or caps because there is no LLM in the call path. Claude writes these words before dialling; the call itself is TwiML <Say> and cannot deviate from them. This is why tier 0 is both the cheapest and the safest mode, and why it ships first."
+}

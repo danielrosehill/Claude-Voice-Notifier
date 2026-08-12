@@ -1,0 +1,12 @@
+.env
+*.local.json
+__pycache__/
+*.pyc
+.venv/
+
+# Real recipient allowlists, real briefs and real transcripts never enter the
+# repo. Anchored with a leading slash so examples/briefs/ is NOT matched —
+# everything under examples/ is fictional and hand-written.
+/recipients/
+/briefs/
+/transcripts/

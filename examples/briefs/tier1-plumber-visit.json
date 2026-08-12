@@ -1,0 +1,46 @@
+{
+  "brief_id": "b_20260812_1710_plumber",
+  "tier": 1,
+  "operator": {
+    "name": "Alex"
+  },
+  "recipient": {
+    "key": "robin",
+    "name": "Robin",
+    "relationship": "Alex's parent-in-law. Older, not especially comfortable with technology. Keep it warm and unhurried, and do not use the word 'agent'.",
+    "number": "+15550178",
+    "language": "en-GB"
+  },
+  "greeting": "Hello Robin, this is Claude — I'm an AI assistant, and Alex asked me to give you a quick call with an update about the flat.",
+  "message": "The plumber came this afternoon, at about two. He replaced the valve under the kitchen sink, and the water's back on now. He said there's nothing else that needs doing.",
+  "anticipated_questions": [
+    {
+      "question": "How much did it cost?",
+      "answer": "Alex will send you the invoice by email this evening, so you'll have the exact figure then."
+    },
+    {
+      "question": "Does he need to come back?",
+      "answer": "No — he said the job is finished and there's nothing outstanding."
+    },
+    {
+      "question": "Can I speak to Alex?",
+      "answer": "Of course — I'll let Alex know you'd like a word and Alex will ring you back."
+    }
+  ],
+  "prohibitions": [
+    "Do not quote, estimate or guess at any cost, even approximately.",
+    "Do not arrange, confirm or suggest any follow-up visit.",
+    "Do not discuss anything about the tenancy or the neighbours.",
+    "Do not say Alex is unavailable or busy — only that Alex asked you to call."
+  ],
+  "closing": "Say that Alex will be in touch about the invoice this evening, thank Robin, and end the call.",
+  "caps": {
+    "max_turns": 8,
+    "max_seconds": 120
+  },
+  "voicemail": {
+    "leave_message": true,
+    "text": "Hello Robin, this is Claude, an AI assistant calling for Alex. Just to say the plumber came this afternoon, replaced the valve under the kitchen sink, and the water's back on. Alex will be in touch this evening. Bye now."
+  },
+  "_comment": "The prohibitions are the interesting field. Each one is a specific thing a helpful model would otherwise volunteer — a ballpark cost, a convenient callback slot, a reason Alex didn't ring personally. Standing rules in the conduct layer cover the general case; this list covers what would go wrong on THIS call. Note also that 'relationship' is doing real work: it sets register and vocabulary, not just tone."
+}
